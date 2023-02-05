@@ -14,10 +14,14 @@ timeout /t 1
 start "" dotnet Logger.dll
 
 :: Bots
-cd ../reference-bot-publish/
+cd ../starter-bots/JavaBot/target
 timeout /t 3
-start "" dotnet ReferenceBot.dll
+start "" java -jar jup.jar
 timeout /t 3
+cd ../../JavaBot2/target
+start "" java -jar nigel.jar
+timeout /t 3
+cd ../../../reference-bot-publish
 start "" dotnet ReferenceBot.dll
 cd ../
 
