@@ -1,6 +1,10 @@
 @echo off
 :: Game Runner
-cd ./runner-publish/
+cd ./starter-bots/JavaBotN1/
+start mvn clean package 
+
+cd ../../runner-publish/
+timeout /t 5
 start "" dotnet GameRunner.dll
 
 :: Game Engine
@@ -14,7 +18,7 @@ timeout /t 1
 start "" dotnet Logger.dll
 
 :: Bots
-cd ../starter-bots/JavaBot/target
+cd ../starter-bots/JavaBotN1/target
 timeout /t 3
 start "" java -jar JavaBot.jar
 timeout /t 3

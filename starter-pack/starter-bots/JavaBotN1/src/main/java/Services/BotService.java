@@ -34,19 +34,37 @@ public class BotService {
     }
 
     public void computeNextPlayerAction(PlayerAction playerAction) {
-        playerAction.action = PlayerActions.FORWARD;
-        playerAction.heading = new Random().nextInt(360);
+        if (bot.size < 20){
+            playerAction.action = PlayerActions.FORWARD;
+            playerAction.heading = new Random().nextInt(360);
+            if (!gameState.getGameObjects().isEmpty()) {
+                var foodList = gameState.getGameObjects()
+                        .stream().filter(item -> item.getGameObjectType() == ObjectTypes.FOOD)
+                        .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item)))
+                        .collect(Collectors.toList());
 
-        if (!gameState.getGameObjects().isEmpty()) {
-            var foodList = gameState.getGameObjects()
-                    .stream().filter(item -> item.getGameObjectType() == ObjectTypes.FOOD)
-                    .sorted(Comparator
-                            .comparing(item -> getDistanceBetween(bot, item)))
-                    .collect(Collectors.toList());
+                var playerList = gameState.getGameObjects()
+                        .stream().filter(item -> item.getGameObjectType() == ObjectTypes.PLAYER)
+                        .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item)))
+                        .collect(Collectors.toList());
 
-            playerAction.heading = getHeadingBetween(foodList.get(0));
+                // playerAction.heading = getHeadingBetween(foodList.get(0));
+                    
+                playerAction.heading = getHeadingBetween(playerList.get(0));
+            }
+            //     var foodList = gameState.getGameObjects()
+            //             .stream().filter(item -> item.getGameObjectType() == ObjectTypes.FOOD)
+            //             .sorted(Comparator
+            //                     .comparing(item -> getDistanceBetween(bot, item)))
+            //             .collect(Collectors.toList());
+    
+            //     playerAction.heading = getHeadingBetween(foodList.get(0));
+            // }
+    
         }
-
+        else{
+            playerAction.action = PlayerActions.FIRETORPEDOES;
+        }
         this.playerAction = playerAction;
     }
 
