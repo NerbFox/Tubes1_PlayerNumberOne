@@ -4,7 +4,7 @@ cd ./starter-bots/JavaBotN1/
 start mvn clean package 
 
 cd ../../runner-publish/
-timeout /t 5
+timeout /t 8
 start "" dotnet GameRunner.dll
 
 :: Game Engine
@@ -22,9 +22,15 @@ cd ../starter-bots/JavaBotN1/target
 timeout /t 3
 start "" java -jar JavaBot.jar
 timeout /t 3
-cd ../../JavaBotN/target
+
+cd ../../JavaBotN2/target
 start "" java -jar JavaBot.jar
 timeout /t 3
+
+cd ../../JavaBotN3/target
+start "" java -jar JavaBot.jar
+timeout /t 3
+
 cd ../../../reference-bot-publish
 start "" dotnet ReferenceBot.dll
 cd ../
