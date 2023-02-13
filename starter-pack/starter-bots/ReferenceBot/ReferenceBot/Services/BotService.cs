@@ -128,8 +128,7 @@ namespace NETCoreBot.Services
         private int ResolveNewTarget()
         {
             int heading;
-            var nearestFood = _gameState.GameObjects.Where(go => go.GameObjectType == ObjectTypes.Food)
-       ,.Running         .OrderBy(GetDistanceBetween)
+            var nearestFood = _gameState.GameObjects.Where(go => go.GameObjectType == ObjectTypes.Food).Running.OrderBy(GetDistanceBetween)
                 .FirstOrDefault();
             var nearestPlayer = _gameState.PlayerGameObjects.Where(bot => bot.Id != _bot.Id).OrderBy(GetDistanceBetween).First();
             var nearestWormhole = _gameState.GameObjects.Where(go => go.GameObjectType == ObjectTypes.Wormhole)

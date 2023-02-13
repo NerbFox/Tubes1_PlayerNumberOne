@@ -59,19 +59,31 @@ public class BotService {
                 .filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVABOMB)
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
         
-        boolean border = false;
-        double distToBorderMin = 5.0;
-        // if (gameState.world.radius - getDistancePosition(bot, 0, 0) <= distToBorderMin ){
-        //     border = true;
-        // }
-        // else{
-        //     border = false;
-        // }
+        var rad = gameState.getWorld().getRadius(); 
+        
+        boolean inBorder = false;
+        int botSize = 25; 
+        double distToBorderMin = 10.0;
+        if (!gameState.getGameObjects().isEmpty()) {   
+            if ((rad - (getDistancePosition(bot, 0, 0)+bot.getSize()/2 )) <= distToBorderMin ){
+                inBorder = true;
+            }
+            else{
+                inBorder = false;
+            }
+        }
+
         playerAction.heading = new Random().nextInt(360);
-        if (bot.size < 20){
+        // if (bot.size < botSize && !superfoodList.isEmpty() && !inBorder){
+        if (bot.size < botSize){
             playerAction.action = PlayerActions.FORWARD;
-            if (!gameState.getGameObjects().isEmpty()) {                
-                playerAction.heading = getHeadingBetween(foodList.get(0));
+            if (!gameState.getGameObjects().isEmpty()) {    // if there are any game objects ?
+                if(!inBorder){
+                    playerAction.heading = getHeadingBetween(foodList.get(0));
+                }
+                else{
+                    playerAction.heading = getHeadingBetween(foodList.get(1));
+                }
             }
         }
         else{
@@ -84,6 +96,7 @@ public class BotService {
                 playerAction.action = PlayerActions.FIRETORPEDOES;
             }
         }
+
         this.playerAction = playerAction;
     }
 
@@ -122,6 +135,5 @@ public class BotService {
     private int toDegrees(double v) {
         return (int) (v * (180 / Math.PI));
     }
-
 
 }
