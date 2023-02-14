@@ -65,13 +65,16 @@ public class BotService {
                 playerAction.heading = getHeadingBetween(playerList.get(1));
                 if (playerList.get(1).size > bot.size) {
                     System.out.println("Opponent too big, searching for food");
-                    playerAction.heading = getHeadingBetween(foodList.get(0));
+                    playerAction.heading = -getHeadingBetween(playerList.get(1));
+                    if (getDistanceBetween(bot, playerList.get(1)) > playerList.get(1).size * 5.5) {
+                        playerAction.heading = getHeadingBetween(playerList.get(1));
+                    }
                     playerAction.action = PlayerActions.FORWARD;
                 } else {
                     if (getDistanceBetween(bot, playerList.get(1)) > playerList.get(1).size * 4) {
                         if (getDistanceBetween(bot, playerList.get(1)) > playerList.get(1).size * 6
                                 && (bot.effects == 0 || bot.effects == 2 || bot.effects == 4 || bot.effects == 6)
-                                && bot.size > 36) {
+                                && bot.size > 48) {
                             System.out.println("Really far away, using afterburner");
                             playerAction.action = PlayerActions.STARTAFTERBURNER;
                         } else if (getDistanceBetween(bot, playerList.get(1)) <= playerList.get(1).size * 6
