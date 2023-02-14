@@ -65,16 +65,16 @@ public class BotService {
                 playerAction.heading = getHeadingBetween(playerList.get(1));
                 if (playerList.get(1).size > bot.size) {
                     System.out.println("Opponent too big, searching for food");
-                    playerAction.heading = getHeadingBetween(playerList.get(0));
+                    playerAction.heading = getHeadingBetween(foodList.get(0));
                     playerAction.action = PlayerActions.FORWARD;
                 } else {
                     if (getDistanceBetween(bot, playerList.get(1)) > playerList.get(1).size * 4) {
-                        if (getDistanceBetween(bot, playerList.get(1)) > playerList.get(1).size * 8
+                        if (getDistanceBetween(bot, playerList.get(1)) > playerList.get(1).size * 6
                                 && (bot.effects == 0 || bot.effects == 2 || bot.effects == 4 || bot.effects == 6)
                                 && bot.size > 36) {
                             System.out.println("Really far away, using afterburner");
                             playerAction.action = PlayerActions.STARTAFTERBURNER;
-                        } else if (getDistanceBetween(bot, playerList.get(1)) <= playerList.get(1).size * 8
+                        } else if (getDistanceBetween(bot, playerList.get(1)) <= playerList.get(1).size * 6
                                 && (bot.effects == 1 || bot.effects == 3 || bot.effects == 5 || bot.effects == 7)
                                 && bot.size <= 36) {
                             System.out.println("Getting closer, turning off afterburner");
@@ -89,6 +89,11 @@ public class BotService {
                         System.out.println("Close enough, firing!");
                         playerAction.action = PlayerActions.FIRETORPEDOES;
                     }
+                }
+                if (playerAction.heading != getHeadingBetween(playerList.get(1))
+                        && (bot.effects == 1 || bot.effects == 3 || bot.effects == 5 || bot.effects == 7)) {
+                    System.out.println("Not going after enemy, stopping afterburner");
+                    playerAction.action = PlayerActions.STOPAFTERBURNER;
                 }
             }
 
