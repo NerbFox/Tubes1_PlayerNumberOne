@@ -41,7 +41,9 @@ public class BotService {
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
         var foodList = gameState.getGameObjects().stream()
                 .filter(item -> (item.getGameObjectType() == ObjectTypes.FOOD
-                        || (item.getGameObjectType() == ObjectTypes.SUPERFOOD)))
+                        || (item.getGameObjectType() == ObjectTypes.SUPERFOOD) 
+                        || (item.getGameObjectType() == ObjectTypes.SUPERNOVAPICKUP)
+                        ))
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
         var wormholeList = gameState.getGameObjects().stream()
                 .filter(item -> item.getGameObjectType() == ObjectTypes.WORMHOLE)
@@ -65,7 +67,7 @@ public class BotService {
         int botSize = 30; 
         double distToBorderMin = 15.0;
         if (!gameState.getGameObjects().isEmpty()) {   
-            if ((rad - (getDistancePosition(bot, 0, 0)+bot.getSize()/2 )) <= distToBorderMin ){
+            if ((rad - (getDistancePosition(bot, 0, 0)+bot.getSize())) <= distToBorderMin ){
                 inBorder = true;
                 System.out.println("inBorder");
             }
@@ -73,12 +75,23 @@ public class BotService {
                 inBorder = false;
             }
         }
+        // algoritma yang diinginkan adalah: greedy, kalo ada food yang searah sama bot lawan, maka bot akan menghindar !! lalu jika tidak ada food yang searah, maka bot akan mengambil food yang terdekat
+        // size itu radius apa diameter?
+        // di valid food tambahin inborder 
+        // n heding klo ada food yang searah sama bot lawan
 
         playerAction.heading = new Random().nextInt(360);
         // if (bot.size < botSize && !superfoodList.isEmpty() && !inBorder){
-        if (bot.size < botSize){
+        if (!gameState.getGameObjects().isEmpty()){
+            // if(supernovaList.isEmpty())
+            if(bot.getSupernovaAvailable()>0){
+                playerAction.heading = getHeadingBetween(playerList.get(1));
+                playerAction.action = PlayerActions.FIRESUPERNOVA;
+            }
+            else
+            {if (bot.size < botSize){
             playerAction.action = PlayerActions.FORWARD;
-            if (!gameState.getGameObjects().isEmpty()) {    // if there are any game objects ?
+            if (!gameState.getGameObjects().isEmpty()) {    // if there are any game objects 
                 if(!inBorder){
                     playerAction.heading = getHeadingBetween(foodList.get(0));
                 }
@@ -86,16 +99,21 @@ public class BotService {
                     playerAction.heading = getHeadingBetween(foodList.get(1));
                 }
             }
-        }
-        else{
-            if(bot.size > playerList.get(1).size){
-                playerAction.heading = getHeadingBetween(playerList.get(1));
-                playerAction.action = PlayerActions.FORWARD;
             }
             else{
-                playerAction.heading = getHeadingBetween(playerList.get(1));
-                playerAction.action = PlayerActions.FIRETORPEDOES;
-            }
+                if(bot.size > playerList.get(1).size){
+                    playerAction.heading = getHeadingBetween(playerList.get(1));
+                    playerAction.action = PlayerActions.FORWARD;
+                }
+                else{
+                    playerAction.heading = getHeadingBetween(playerList.get(1));
+                    playerAction.action = PlayerActions.FIRETORPEDOES;
+                }
+            }}
+            // else{
+            //     playerAction.action = PlayerActions.FORWARD;
+            //     playerAction.heading = getHeadingBetween(supernovaList.get(0));
+            // }
         }
 
         this.playerAction = playerAction;
