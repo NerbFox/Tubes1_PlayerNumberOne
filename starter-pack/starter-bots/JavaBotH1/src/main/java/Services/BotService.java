@@ -32,20 +32,22 @@ public class BotService {
         this.playerAction = playerAction;
     }
 
-    public Boolean isFoodValid(GameObject food, List<GameObject> gasCloudList, List<GameObject> asteroidField) {
-        ListIterator<GameObject> itGasCloud = gasCloudList.listIterator();
-        ListIterator<GameObject> itAsteroidField = asteroidField.listIterator();
-        while (itGasCloud.hasNext()) {
-            if (getDistanceBetween(food, itGasCloud.next()) <= itGasCloud.next().size) {
-                System.out.println("Food not valid - Gas Clouds Ahead");
-                return false;
+    private Boolean isFoodValid(GameObject food, List<GameObject> gasCloudList, List<GameObject> asteroidFieldList) {
+        if (!gasCloudList.isEmpty()) {
+            for (GameObject gasCloud : gasCloudList) {
+                if (getDistanceBetween(food, gasCloud) <= gasCloud.size) {
+                    System.out.println("Food not valid - Gas Clouds Ahead");
+                    return false;
+                }
             }
         }
 
-        while (itAsteroidField.hasNext()) {
-            if (getDistanceBetween(food, itAsteroidField.next()) <= itAsteroidField.next().size) {
-                System.out.println("Food not valid - Asteroid Fields Ahead");
-                return false;
+        if (!asteroidFieldList.isEmpty()) {
+            for (GameObject asteroidField : asteroidFieldList) {
+                if (getDistanceBetween(food, asteroidField) <= asteroidField.size) {
+                    System.out.println("Food not valid - Asteroid Fields Ahead");
+                    return false;
+                }
             }
         }
 
@@ -87,31 +89,48 @@ public class BotService {
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
 
         // Harus ditambah kasus food abis
-
+        // System.out.println("food");
+        // System.out.println(foodList);
+        // System.out.println("gascloud");
+        // System.out.println(gasCloudList);
+        // System.out.println("asteroid");
+        // System.out.println(asteroidFieldList);
         if (!gameState.getGameObjects().isEmpty()) {
-            Integer foodIndex = 0;
-            var foodTarget = foodList.get(foodIndex);
-            while (!isFoodValid(foodTarget, gasCloudList, asteroidFieldList)) {
-                System.out.println("test");
-                foodIndex++;
-                foodTarget = foodList.get(foodIndex);
-            }
+            if (!foodList.isEmpty()) {
+                Integer foodIndex = 0;
+                var foodTarget = foodList.get(foodIndex);
+                while (!isFoodValid(foodTarget, gasCloudList, asteroidFieldList)) {
+                    System.out.println("test");
+                    foodIndex++;
+                    foodTarget = foodList.get(foodIndex);
+                }
 
-            if (bot.size < playerList.get(1).size) {
-                // var distance = getDistanceBetween(bot, playerList.get(1));
-                // if (distance - playerList.get(1).size / 2 <= 20) {
-                // playerAction.heading = (getHeadingBetween(playerList.get(1)) - 180) % 360;
-                // playerAction.action = PlayerActions.FIRETORPEDOES;
-                // } else {
-                // }
-                playerAction.heading = getHeadingBetween(foodTarget);
+                if (bot.size < 50 || getDistanceBetween(bot, playerList.get(1)) > 30) {
+                    var distance = getDistanceBetween(bot, playerList.get(1));
+                    if (distance - playerList.get(1).size - bot.size <= 25 && bot.size < playerList.get(1).size) {
+                        playerAction.heading = playerList.get(1).getCurrentHeading();
+                        playerAction.action = PlayerActions.FORWARD;
+                        System.out.println("Kaboor");
+                        if (bot.torpedoCount >= 3) {
+                            playerAction.heading = getHeadingBetween(bot, playerList.get(1));
+                            playerAction.action = PlayerActions.FIRETORPEDOES;
+                        }
+                    } else {
+                        playerAction.heading = getHeadingBetween(foodTarget);
+                        System.out.println("eat food");
+                    }
+                    // if (bot.effects == 1 || bot.effects == 3 || bot.effects == 5 || bot.effects
+                    // == 7) {
+                    // playerAction.action = PlayerActions.FORWARD;
+                    // } else {
+                    // playerAction.action = PlayerActions.STARTAFTERBURNER;
+                    // System.out.println("START NITRO");
+                    // }
 
-            } else {
-                playerAction.heading = getHeadingBetween(playerList.get(1));
-                if (bot.torpedoCount <= 3) {
-                    playerAction.action = PlayerActions.FORWARD;
                 } else {
+                    playerAction.heading = getHeadingBetween(playerList.get(1));
                     playerAction.action = PlayerActions.FIRETORPEDOES;
+                    System.out.println("ATK");
                 }
             }
 
