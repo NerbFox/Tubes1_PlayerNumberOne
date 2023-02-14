@@ -24,13 +24,10 @@ start "" java -jar JavaBot.jar
 cd ../../JavaBotN1/target
 timeout /t 3
 start "" java -jar JavaBot.jar
+cd ../../JavaBot/target
+timeout /t 3
+start "" java -jar JavaBot.jar
 cd ../../../reference-bot-publish
-timeout /t 3
-start "" dotnet ReferenceBot.dll
-timeout /t 3
-start "" dotnet ReferenceBot.dll
-timeout /t 3
-start "" dotnet ReferenceBot.dll
 timeout /t 3
 start "" dotnet ReferenceBot.dll
 cd ../
