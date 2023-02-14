@@ -50,9 +50,6 @@ public class BotService {
         var gasCloudList = gameState.getGameObjects().stream()
                 .filter(item -> item.getGameObjectType() == ObjectTypes.GASCLOUD)
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
-        var superfoodList = gameState.getGameObjects().stream()
-                .filter(item -> item.getGameObjectType() == ObjectTypes.SUPERFOOD)
-                .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
         var supernovaList = gameState.getGameObjects().stream()
                 .filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVAPICKUP)
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
@@ -60,23 +57,38 @@ public class BotService {
                 .filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVABOMB)
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
         if (!gameState.getGameObjects().isEmpty()) {
-            if (bot.size < 24) {
+            if (bot.size < 30) {
+                System.out.println("Too small, searching for food");
                 playerAction.heading = getHeadingBetween(foodList.get(0));
                 playerAction.action = PlayerActions.FORWARD;
             } else {
                 playerAction.heading = getHeadingBetween(playerList.get(1));
-                if (getDistanceBetween(bot, playerList.get(1)) > 800 + playerList.get(1).size) {
-                    playerAction.action = PlayerActions.STARTAFTERBURNER;
-                } else {
-                    playerAction.action = PlayerActions.STOPAFTERBURNER;
-                }
-                if (getDistanceBetween(bot, playerList.get(1)) > 200 + playerList.get(1).size) {
-                    if (bot.size < playerList.get(1).size) {
-                        playerAction.heading = getHeadingBetween(foodList.get(0));
-                    }
+                if (playerList.get(1).size > bot.size) {
+                    System.out.println("Opponent too big, searching for food");
+                    playerAction.heading = getHeadingBetween(playerList.get(0));
                     playerAction.action = PlayerActions.FORWARD;
                 } else {
-                    playerAction.action = PlayerActions.FIRETORPEDOES;
+                    if (getDistanceBetween(bot, playerList.get(1)) > playerList.get(1).size * 4) {
+                        if (getDistanceBetween(bot, playerList.get(1)) > playerList.get(1).size * 8
+                                && (bot.effects == 0 || bot.effects == 2 || bot.effects == 4 || bot.effects == 6)
+                                && bot.size > 36) {
+                            System.out.println("Really far away, using afterburner");
+                            playerAction.action = PlayerActions.STARTAFTERBURNER;
+                        } else if (getDistanceBetween(bot, playerList.get(1)) <= playerList.get(1).size * 8
+                                && (bot.effects == 1 || bot.effects == 3 || bot.effects == 5 || bot.effects == 7)
+                                && bot.size <= 36) {
+                            System.out.println("Getting closer, turning off afterburner");
+                            playerAction.action = PlayerActions.STOPAFTERBURNER;
+                        } else {
+                            System.out.println("Moving closer");
+                            playerAction.action = PlayerActions.FORWARD;
+                        }
+                        // System.out.println("Too Far, getting closer");
+                        // playerAction.action = PlayerActions.FORWARD;
+                    } else {
+                        System.out.println("Close enough, firing!");
+                        playerAction.action = PlayerActions.FIRETORPEDOES;
+                    }
                 }
             }
 
