@@ -44,11 +44,13 @@ public class Main {
             gameState.world = gameStateDto.getWorld();
 
             for (Map.Entry<String, List<Integer>> objectEntry : gameStateDto.getGameObjects().entrySet()) {
-                gameState.getGameObjects().add(GameObject.FromStateList(UUID.fromString(objectEntry.getKey()), objectEntry.getValue()));
+                gameState.getGameObjects()
+                        .add(GameObject.FromStateList(UUID.fromString(objectEntry.getKey()), objectEntry.getValue()));
             }
 
             for (Map.Entry<String, List<Integer>> objectEntry : gameStateDto.getPlayerObjects().entrySet()) {
-                gameState.getPlayerGameObjects().add(GameObject.FromStateList(UUID.fromString(objectEntry.getKey()), objectEntry.getValue()));
+                gameState.getPlayerGameObjects()
+                        .add(GameObject.FromStateList(UUID.fromString(objectEntry.getKey()), objectEntry.getValue()));
             }
 
             botService.setGameState(gameState);
@@ -58,9 +60,13 @@ public class Main {
 
         Thread.sleep(1000);
         System.out.println("Registering with the runner...");
+<<<<<<< HEAD:starter-pack/starter-bots/JavaBotN2/src/main/java/Main.java
         hubConnection.send("Register", token, "M1 Bot");
+=======
+        hubConnection.send("Register", token, "Player#One");
+>>>>>>> hosea:starter-pack/starter-bots/JavaBot/src/main/java/Main.java
 
-        //This is a blocking call
+        // This is a blocking call
         hubConnection.start().subscribe(() -> {
             while (hubConnection.getConnectionState() == HubConnectionState.CONNECTED) {
                 Thread.sleep(20);

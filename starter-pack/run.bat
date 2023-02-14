@@ -29,6 +29,10 @@ timeout /t 3
 start "" dotnet ReferenceBot.dll
 timeout /t 3
 start "" dotnet ReferenceBot.dll
+timeout /t 3
+start "" dotnet ReferenceBot.dll
+timeout /t 3
+start "" dotnet ReferenceBot.dll
 cd ../
 
 pause
