@@ -62,11 +62,12 @@ public class BotService {
         var rad = gameState.getWorld().getRadius(); 
         
         boolean inBorder = false;
-        int botSize = 25; 
-        double distToBorderMin = 10.0;
+        int botSize = 30; 
+        double distToBorderMin = 15.0;
         if (!gameState.getGameObjects().isEmpty()) {   
             if ((rad - (getDistancePosition(bot, 0, 0)+bot.getSize()/2 )) <= distToBorderMin ){
                 inBorder = true;
+                System.out.println("inBorder");
             }
             else{
                 inBorder = false;
