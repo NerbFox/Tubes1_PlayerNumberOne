@@ -36,14 +36,51 @@ public class BotService {
         playerAction.action = PlayerActions.FORWARD;
         playerAction.heading = new Random().nextInt(360);
 
-        if (!gameState.getGameObjects().isEmpty()) {
-            var foodList = gameState.getGameObjects()
-                    .stream().filter(item -> item.getGameObjectType() == ObjectTypes.FOOD)
-                    .sorted(Comparator
-                            .comparing(item -> getDistanceBetween(bot, item)))
-                    .collect(Collectors.toList());
+        var torpedoList = gameState.getGameObjects().stream()
+                .filter(item -> item.getGameObjectType() == ObjectTypes.TORPEDOSALVO)
+                .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
+        var playerList = gameState.getPlayerGameObjects().stream()
+                .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
+        var foodList = gameState.getGameObjects().stream()
+                .filter(item -> (item.getGameObjectType() == ObjectTypes.FOOD
+                        || (item.getGameObjectType() == ObjectTypes.SUPERFOOD)))
+                .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
+        var wormholeList = gameState.getGameObjects().stream()
+                .filter(item -> item.getGameObjectType() == ObjectTypes.WORMHOLE)
+                .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
+        var gasCloudList = gameState.getGameObjects().stream()
+                .filter(item -> item.getGameObjectType() == ObjectTypes.GASCLOUD)
+                .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
+        var superfoodList = gameState.getGameObjects().stream()
+                .filter(item -> item.getGameObjectType() == ObjectTypes.SUPERFOOD)
+                .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
+        var supernovaList = gameState.getGameObjects().stream()
+                .filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVAPICKUP)
+                .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
+        var supernovaBombList = gameState.getGameObjects().stream()
+                .filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVABOMB)
+                .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
 
-            playerAction.heading = getHeadingBetween(foodList.get(0));
+        if (!gameState.getGameObjects().isEmpty()) {
+
+            if (bot.size < playerList.get(1).size + 10) {
+                var distance = getDistanceBetween(bot, playerList.get(1));
+                if (distance - playerList.get(1).size / 2 <= 20) {
+                    playerAction.heading = getHeadingBetween(playerList.get(1));
+                    playerAction.action = PlayerActions.FIRETORPEDOES;
+                } else {
+                    playerAction.heading = getHeadingBetween(foodList.get(0));
+                }
+
+            } else {
+                playerAction.heading = getHeadingBetween(playerList.get(1));
+                if (bot.torpedoCount <= 3) {
+                    playerAction.action = PlayerActions.FORWARD;
+                } else {
+                    playerAction.action = PlayerActions.FIRETORPEDOES;
+                }
+            }
+
         }
 
         this.playerAction = playerAction;

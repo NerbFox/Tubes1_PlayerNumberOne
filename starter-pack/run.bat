@@ -1,5 +1,10 @@
 @echo off
 :: Game Runner
+cd ./starter-bots/JavaBotH1
+timeout /t 1
+start mvn clean package
+timeout /t 5
+cd ../..
 cd ./runner-publish/
 start "" dotnet GameRunner.dll
 
@@ -14,11 +19,15 @@ timeout /t 1
 start "" dotnet Logger.dll
 
 :: Bots
-cd ../starter-bots/JavaBot/target
+cd ../starter-bots/JavaBotH1/target
 timeout /t 3
 start "" java -jar JavaBot.jar
 timeout /t 3
 cd ../../../reference-bot-publish
+start "" dotnet ReferenceBot.dll
+timeout /t 3
+start "" dotnet ReferenceBot.dll
+timeout /t 3
 start "" dotnet ReferenceBot.dll
 cd ../
 
