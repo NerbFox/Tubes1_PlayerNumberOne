@@ -46,4 +46,4 @@ Room for improvement:
 ## Pembagian Tugas
 1. Nigel Sahl (13521043)                : 
 2. Muhammad Naufal Nalendra (13521152)  : 
-3. Hosea Nathanael Abetnego             :
+3. Hosea Nathanael Abetnego (13521057)  :

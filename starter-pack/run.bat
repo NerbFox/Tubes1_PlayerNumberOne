@@ -21,7 +21,10 @@ start "" dotnet Logger.dll
 :: Bots
 cd ../starter-bots/JavaBotH1/target
 timeout /t 3
-start "" java -jar JavaBot.jar
+start "" java -jar jup.jar
+timeout /t 3
+cd ../../JavaBot2/target
+start "" java -jar nigel.jar
 timeout /t 3
 cd ../../../reference-bot-publish
 start "" dotnet ReferenceBot.dll
