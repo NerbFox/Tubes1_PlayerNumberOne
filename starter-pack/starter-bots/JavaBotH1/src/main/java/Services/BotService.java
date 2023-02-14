@@ -112,7 +112,7 @@ public class BotService {
                         playerAction.action = PlayerActions.FORWARD;
                         System.out.println("Kaboor");
                         if (bot.torpedoCount >= 3) {
-                            playerAction.heading = getHeadingBetween(bot, playerList.get(1));
+                            playerAction.heading = getHeadingBetween(playerList.get(1));
                             playerAction.action = PlayerActions.FIRETORPEDOES;
                         }
                     } else {
