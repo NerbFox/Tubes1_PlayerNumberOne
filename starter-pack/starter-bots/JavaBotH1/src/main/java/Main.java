@@ -35,11 +35,7 @@ public class Main {
             System.out.println("Registered with the runner " + id);
 
             Position position = new Position();
-<<<<<<<< HEAD:starter-pack/starter-bots/JavaBotH1/src/main/java/Main.java
             GameObject bot = new GameObject(id, 10, 20, 0, position, ObjectTypes.PLAYER, 0, 0, 0, 1, 0);
-========
-            GameObject bot = new GameObject(id, 10, 20, 0, position, ObjectTypes.PLAYER, 0, 0, 0, 0, 0);
->>>>>>>> Nigel:starter-pack/starter-bots/JavaBotN1/src/main/java/Main.java
             botService.setBot(bot);
         }, UUID.class);
 
@@ -64,7 +60,7 @@ public class Main {
 
         Thread.sleep(1000);
         System.out.println("Registering with the runner...");
-        hubConnection.send("Register", token, "JavaBot");
+        hubConnection.send("Register", token, "Jup Bot");
 
         // This is a blocking call
         hubConnection.start().subscribe(() -> {
