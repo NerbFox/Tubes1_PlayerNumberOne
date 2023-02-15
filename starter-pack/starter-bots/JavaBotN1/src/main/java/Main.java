@@ -62,7 +62,7 @@ public class Main {
 
         Thread.sleep(1000);
         System.out.println("Registering with the runner...");
-        hu bConnection.send("Register", token, "PlayerNumberOne");
+        hubConnection.send("Register", token, "PlayerNumberOne");
 
         // This is a blocking call
         hubConnection.start().subscribe(() -> {
