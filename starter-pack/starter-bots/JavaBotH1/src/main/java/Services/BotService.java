@@ -33,9 +33,10 @@ public class BotService {
     }
 
     private Boolean isFoodValid(GameObject food, List<GameObject> gasCloudList, List<GameObject> asteroidFieldList) {
+        var distError = 5;
         if (!gasCloudList.isEmpty()) {
             for (GameObject gasCloud : gasCloudList) {
-                if (getDistanceBetween(food, gasCloud) <= gasCloud.size) {
+                if (getDistanceBetween(food, gasCloud) + distError <= gasCloud.size) {
                     System.out.println("Food not valid - Gas Clouds Ahead");
                     return false;
                 }
@@ -44,14 +45,14 @@ public class BotService {
 
         if (!asteroidFieldList.isEmpty()) {
             for (GameObject asteroidField : asteroidFieldList) {
-                if (getDistanceBetween(food, asteroidField) <= asteroidField.size) {
+                if (getDistanceBetween(food, asteroidField) + distError <= asteroidField.size) {
                     System.out.println("Food not valid - Asteroid Fields Ahead");
                     return false;
                 }
             }
         }
 
-        System.out.println("Food valid");
+        // System.out.println("Food valid");
         return true;
 
     }
@@ -87,6 +88,9 @@ public class BotService {
         var supernovaBombList = gameState.getGameObjects().stream()
                 .filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVABOMB)
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
+        var teleporterList = gameState.getGameObjects().stream()
+                .filter(item -> item.getGameObjectType() == ObjectTypes.TELEPORTER)
+                .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
 
         // Harus ditambah kasus food abis
         // System.out.println("food");
@@ -95,7 +99,14 @@ public class BotService {
         // System.out.println(gasCloudList);
         // System.out.println("asteroid");
         // System.out.println(asteroidFieldList);
+
+        Integer safeDistancePlayer = 30;
+        Integer teleporterFleeThresholdSize = 40;
+        Integer teleporterAttackThresholdSize = 60;
+        Integer shieldAttackThresholdSize = 60;
+
         if (!gameState.getGameObjects().isEmpty()) {
+
             if (!foodList.isEmpty()) {
                 Integer foodIndex = 0;
                 var foodTarget = foodList.get(foodIndex);
@@ -105,38 +116,55 @@ public class BotService {
                     foodTarget = foodList.get(foodIndex);
                 }
 
-                if (bot.size < 50 || getDistanceBetween(bot, playerList.get(1)) > 30) {
+                if (bot.size < playerList.get(1).size + 20) {
                     var distance = getDistanceBetween(bot, playerList.get(1));
-                    if (distance - playerList.get(1).size - bot.size <= 25 && bot.size < playerList.get(1).size) {
-                        playerAction.heading = playerList.get(1).getCurrentHeading();
-                        playerAction.action = PlayerActions.FORWARD;
-                        System.out.println("Kaboor");
-                        if (bot.torpedoCount >= 3) {
+                    if (distance - playerList.get(1).size - bot.size <= safeDistancePlayer) {
+
+                        if (bot.teleCount == 1 && bot.size >= teleporterFleeThresholdSize) {
+                            playerAction.heading = playerList.get(1).getCurrentHeading();
+                            playerAction.action = PlayerActions.FIRETELEPORT;
+                            System.out.println("Firing teleport to flee");
+                        } else if (bot.torpedoCount >= 2) {
                             playerAction.heading = getHeadingBetween(playerList.get(1));
                             playerAction.action = PlayerActions.FIRETORPEDOES;
+                            System.out.println("Firing torpedoes");
+                        } else {
+                            playerAction.heading = playerList.get(1).getCurrentHeading();
+                            playerAction.action = PlayerActions.FORWARD;
+                            System.out.println("Kaboor");
                         }
+
                     } else {
                         playerAction.heading = getHeadingBetween(foodTarget);
                         System.out.println("eat food");
                     }
-                    // if (bot.effects == 1 || bot.effects == 3 || bot.effects == 5 || bot.effects
-                    // == 7) {
-                    // playerAction.action = PlayerActions.FORWARD;
-                    // } else {
-                    // playerAction.action = PlayerActions.STARTAFTERBURNER;
-                    // System.out.println("START NITRO");
-                    // }
 
                 } else {
                     playerAction.heading = getHeadingBetween(playerList.get(1));
-                    playerAction.action = PlayerActions.FIRETORPEDOES;
-                    System.out.println("ATK");
+                    if (bot.teleCount == 1 && bot.size >= teleporterAttackThresholdSize) {
+                        playerAction.action = PlayerActions.FIRETELEPORT;
+                        System.out.println("Fire teleporter to enemy");
+                    } else if (bot.torpedoCount >= 2) {
+                        playerAction.action = PlayerActions.FIRETORPEDOES;
+                        System.out.println("Firing torpedoes to enemy");
+                    } else {
+                        playerAction.action = PlayerActions.FORWARD;
+                        System.out.println("Chasing enemy");
+                    }
+                }
+
+                if (!teleporterList.isEmpty()) {
+                    if (getDistanceBetween(bot, teleporterList.get(0)) < getDistanceBetween(bot, playerList.get(1))
+                            - 25) {
+                        playerAction.action = PlayerActions.TELEPORT;
+                        System.out.println("TELEPORTING");
+                    }
                 }
             }
-
         }
 
         this.playerAction = playerAction;
+
     }
 
     public GameState getGameState() {
