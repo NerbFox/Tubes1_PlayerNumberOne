@@ -32,11 +32,12 @@ public class BotService {
         this.playerAction = playerAction;
     }
 
-    private Boolean isFoodValid(GameObject food, List<GameObject> gasCloudList, List<GameObject> asteroidFieldList) {
+    private Boolean isNextTargetValid(GameObject object, List<GameObject> gasCloudList,
+            List<GameObject> asteroidFieldList, List<GameObject> playerList) {
         var distError = 5;
         if (!gasCloudList.isEmpty()) {
             for (GameObject gasCloud : gasCloudList) {
-                if (getDistanceBetween(food, gasCloud) + distError <= gasCloud.size) {
+                if (getDistanceBetween(object, gasCloud) + distError <= gasCloud.size) {
                     System.out.println("Food not valid - Gas Clouds Ahead");
                     return false;
                 }
@@ -45,16 +46,51 @@ public class BotService {
 
         if (!asteroidFieldList.isEmpty()) {
             for (GameObject asteroidField : asteroidFieldList) {
-                if (getDistanceBetween(food, asteroidField) + distError <= asteroidField.size) {
+                if (getDistanceBetween(object, asteroidField) + distError <= asteroidField.size) {
                     System.out.println("Food not valid - Asteroid Fields Ahead");
                     return false;
                 }
             }
         }
+        // heading if ini food baru lakuin ini
+        var distNear = 10;
+        var degNear = 5;
+        if (!playerList.isEmpty()) {
+            var dist = getDistanceBetween(object, playerList.get(1)) - bot.size - playerList.get(0).getSize();
+            if ((dist <= distNear) && (getHeadingBetween(object) <= (getHeadingBetween(playerList.get(1)) + degNear))
+                    && (getHeadingBetween(object) >= getHeadingBetween(playerList.get(1)) - degNear)) {
+                System.out.println("Food not valid - Object heading not good");
+                return false;
+            }
+            // for(GameObject player : playerList ){
 
-        // System.out.println("Food valid");
+        }
+        // inBorder
+        if (inBorderValid(object)) {
+            System.out.println("Food not valid - Food mau keluar");
+            return false;
+        }
+
+        System.out.println("Food valid");
         return true;
 
+    }
+
+    private boolean inBorderValid(GameObject object) {
+        boolean inBorder = false;
+        double distToBorderMin = 15.0;
+        var rad = gameState.getWorld().getRadius();
+
+        if (!gameState.getGameObjects().isEmpty()) {
+            if ((rad - (getDistancePosition(object, 0, 0) + object.getSize())) <= distToBorderMin) {
+                inBorder = true;
+                System.out.println("inBorder");
+            } else {
+                inBorder = false;
+                System.out.println("outBorder");
+            }
+        }
+        return inBorder;
     }
 
     public void computeNextPlayerAction(PlayerAction playerAction) {
@@ -85,9 +121,6 @@ public class BotService {
         var supernovaList = gameState.getGameObjects().stream()
                 .filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVAPICKUP)
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
-        var supernovaBombList = gameState.getGameObjects().stream()
-                .filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVABOMB)
-                .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
         var teleporterList = gameState.getGameObjects().stream()
                 .filter(item -> item.getGameObjectType() == ObjectTypes.TELEPORTER)
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
@@ -110,7 +143,7 @@ public class BotService {
             if (!foodList.isEmpty()) {
                 Integer foodIndex = 0;
                 var foodTarget = foodList.get(foodIndex);
-                while (!isFoodValid(foodTarget, gasCloudList, asteroidFieldList)) {
+                while (!isNextTargetValid(foodTarget, gasCloudList, asteroidFieldList, playerList)) {
                     System.out.println("test");
                     foodIndex++;
                     foodTarget = foodList.get(foodIndex);
@@ -120,7 +153,7 @@ public class BotService {
                     var distance = getDistanceBetween(bot, playerList.get(1));
                     if (distance - playerList.get(1).size - bot.size <= safeDistancePlayer) {
 
-                        if (bot.teleCount == 1 && bot.size >= teleporterFleeThresholdSize) {
+                        if (bot.teleCount > 0 && bot.size >= teleporterFleeThresholdSize) {
                             playerAction.heading = playerList.get(1).getCurrentHeading();
                             playerAction.action = PlayerActions.FIRETELEPORT;
                             System.out.println("Firing teleport to flee");
@@ -141,7 +174,7 @@ public class BotService {
 
                 } else {
                     playerAction.heading = getHeadingBetween(playerList.get(1));
-                    if (bot.teleCount == 1 && bot.size >= teleporterAttackThresholdSize) {
+                    if (bot.teleCount > 0 && bot.size >= teleporterAttackThresholdSize) {
                         playerAction.action = PlayerActions.FIRETELEPORT;
                         System.out.println("Fire teleporter to enemy");
                     } else if (bot.torpedoCount >= 2) {
@@ -185,6 +218,12 @@ public class BotService {
     private double getDistanceBetween(GameObject object1, GameObject object2) {
         var triangleX = Math.abs(object1.getPosition().x - object2.getPosition().x);
         var triangleY = Math.abs(object1.getPosition().y - object2.getPosition().y);
+        return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
+    }
+
+    private double getDistancePosition(GameObject object1, int x, int y) {
+        var triangleX = Math.abs(object1.getPosition().x - x);
+        var triangleY = Math.abs(object1.getPosition().y - y);
         return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
     }
 
