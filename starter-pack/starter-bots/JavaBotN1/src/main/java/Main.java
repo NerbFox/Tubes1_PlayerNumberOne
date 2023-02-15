@@ -35,15 +35,7 @@ public class Main {
             System.out.println("Registered with the runner " + id);
 
             Position position = new Position();
-<<<<<<< HEAD
-<<<<<<<< HEAD:starter-pack/starter-bots/JavaBotH1/src/main/java/Main.java
             GameObject bot = new GameObject(id, 10, 20, 0, position, ObjectTypes.PLAYER, 0, 0, 0, 1, 0);
-========
-            GameObject bot = new GameObject(id, 10, 20, 0, position, ObjectTypes.PLAYER, 0, 0, 0, 0, 0);
->>>>>>>> Nigel:starter-pack/starter-bots/JavaBotN1/src/main/java/Main.java
-=======
-            GameObject bot = new GameObject(id, 10, 20, 0, position, ObjectTypes.PLAYER, 0, 0, 0, 1, 0);
->>>>>>> Nigel
             botService.setBot(bot);
         }, UUID.class);
 
@@ -53,6 +45,7 @@ public class Main {
 
             for (Map.Entry<String, List<Integer>> objectEntry : gameStateDto.getGameObjects().entrySet()) {
                 gameState.getGameObjects()
+
                         .add(GameObject.FromStateList(UUID.fromString(objectEntry.getKey()), objectEntry.getValue()));
             }
 
@@ -68,11 +61,7 @@ public class Main {
 
         Thread.sleep(1000);
         System.out.println("Registering with the runner...");
-<<<<<<< HEAD
-        hubConnection.send("Register", token, "JavaBot");
-=======
         hubConnection.send("Register", token, "PlayerNumberOne");
->>>>>>> Nigel
 
         // This is a blocking call
         hubConnection.start().subscribe(() -> {
