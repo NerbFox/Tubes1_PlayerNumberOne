@@ -18,11 +18,11 @@ cd ../starter-bots/JavaBot/target
 timeout /t 3
 start "" java -jar JavaBot.jar
 timeout /t 3
+start "" java -jar Hanif.jar
+timeout /t 3
+start "" java -jar Nigel.jar
+timeout /t 3
 cd ../../../reference-bot-publish
-start "" dotnet ReferenceBot.dll
-timeout /t 3
-start "" dotnet ReferenceBot.dll
-timeout /t 3
 start "" dotnet ReferenceBot.dll
 cd ../
 

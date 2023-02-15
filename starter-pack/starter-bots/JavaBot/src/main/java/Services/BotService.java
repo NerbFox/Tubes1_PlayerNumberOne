@@ -60,7 +60,7 @@ public class BotService {
         if (!gameState.getGameObjects().isEmpty()) {
             var nearestPlayer = playerList.get(1);
             var nearestFood = foodList.get(0);
-            boolean isAfterBurnerOn = (bot.effects == 0 || bot.effects == 2 || bot.effects == 4 || bot.effects == 6);
+            boolean isAfterBurnerOff = (bot.effects == 0 || bot.effects == 2 || bot.effects == 4 || bot.effects == 6);
             var sizeDiffWithPlayer = nearestPlayer.size - bot.size;
             if (bot.size < 30) { /* Finding food if too small */
                 System.out.println("Too small, searching for food");
@@ -68,7 +68,7 @@ public class BotService {
                 playerAction.action = PlayerActions.FORWARD;
             } else { /* Size big enough, start calculating attack */
                 playerAction.heading = getHeadingBetween(nearestPlayer);
-                if (sizeDiffWithPlayer > bot.size) { /* Enemy too big */
+                if (sizeDiffWithPlayer > 75) { /* Enemy too big */
                     System.out.println("Opponent too big!");
                     if (getDistanceBetween(bot, nearestPlayer) > nearestPlayer.size + bot.size + 300) { /*
                                                                                                          * Shooting from
@@ -83,15 +83,15 @@ public class BotService {
                         playerAction.action = PlayerActions.FORWARD;
                     }
                 } else { /* Valid enemy to attack */
-                    if (getDistanceBetween(bot, nearestPlayer) > nearestPlayer.size * 3) { /* Need to get closer */
-                        if (getDistanceBetween(bot, nearestPlayer) > nearestPlayer.size * 5
-                                && !isAfterBurnerOn
+                    if (getDistanceBetween(bot, nearestPlayer) > nearestPlayer.size * 5) { /* Need to get closer */
+                        if (getDistanceBetween(bot, nearestPlayer) > nearestPlayer.size * 7
+                                && isAfterBurnerOff
                                 && bot.size > 48) { /* Too far away */
                             System.out.println("Really far away, using afterburner");
                             playerAction.action = PlayerActions.STARTAFTERBURNER;
-                        } else if (getDistanceBetween(bot, nearestPlayer) <= nearestPlayer.size * 5
-                                && getDistanceBetween(bot, nearestPlayer) > nearestPlayer.size * 4
-                                && isAfterBurnerOn
+                        } else if (getDistanceBetween(bot, nearestPlayer) <= nearestPlayer.size * 7
+                                && getDistanceBetween(bot, nearestPlayer) > nearestPlayer.size * 6
+                                && !isAfterBurnerOff
                                 && bot.size <= 36) { /* Getting closer */
                             System.out.println("Getting closer, turning off afterburner");
                             playerAction.action = PlayerActions.STOPAFTERBURNER;
@@ -107,7 +107,7 @@ public class BotService {
                     }
                 }
                 if (playerAction.heading != getHeadingBetween(nearestPlayer)
-                        && isAfterBurnerOn) { /* Make sure afterburner off while not going towards enemy */
+                        && !isAfterBurnerOff) { /* Make sure afterburner off while not going towards enemy */
                     System.out.println("Not going after enemy, stopping afterburner");
                     playerAction.action = PlayerActions.STOPAFTERBURNER;
                 }
