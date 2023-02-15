@@ -71,7 +71,7 @@ public class BotService {
             return false;
         }
 
-        System.out.println("Food valid");
+        // System.out.println("Food valid");
         return true;
 
     }
@@ -87,7 +87,7 @@ public class BotService {
                 System.out.println("inBorder");
             } else {
                 inBorder = false;
-                System.out.println("outBorder");
+                // System.out.println("outBorder");
             }
         }
         return inBorder;
@@ -101,7 +101,11 @@ public class BotService {
                 .filter(item -> item.getGameObjectType() == ObjectTypes.TORPEDOSALVO)
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
         var playerList = gameState.getPlayerGameObjects().stream()
+                .filter(item -> item.getGameObjectType() == ObjectTypes.PLAYER)
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
+        var playerListBySize = gameState.getPlayerGameObjects().stream()
+                .filter(item -> item.getGameObjectType() == ObjectTypes.PLAYER)
+                .sorted(Comparator.comparing(item -> item.size)).collect(Collectors.toList());
         var foodList = gameState.getGameObjects().stream()
                 .filter(item -> (item.getGameObjectType() == ObjectTypes.FOOD
                         || (item.getGameObjectType() == ObjectTypes.SUPERFOOD)))
@@ -133,10 +137,11 @@ public class BotService {
         // System.out.println("asteroid");
         // System.out.println(asteroidFieldList);
 
-        Integer safeDistancePlayer = 30;
+        Integer safeDistancePlayer = 50;
         Integer teleporterFleeThresholdSize = 40;
-        Integer teleporterAttackThresholdSize = 60;
+        Integer teleporterAttackThresholdSize = 55;
         Integer shieldAttackThresholdSize = 60;
+        Integer torpedoThresholdSize = 25;
 
         if (!gameState.getGameObjects().isEmpty()) {
 
@@ -144,29 +149,35 @@ public class BotService {
                 Integer foodIndex = 0;
                 var foodTarget = foodList.get(foodIndex);
                 while (!isNextTargetValid(foodTarget, gasCloudList, asteroidFieldList, playerList)) {
-                    System.out.println("test");
+                    System.out.println("Change food target, food isnt valid");
                     foodIndex++;
                     foodTarget = foodList.get(foodIndex);
                 }
 
                 if (bot.size < playerList.get(1).size + 20) {
                     var distance = getDistanceBetween(bot, playerList.get(1));
-                    if (distance - playerList.get(1).size - bot.size <= safeDistancePlayer) {
+                    var distanceFixed = distance - playerList.get(1).size - bot.size;
+                    if (distanceFixed <= safeDistancePlayer) {
 
                         if (bot.teleCount > 0 && bot.size >= teleporterFleeThresholdSize) {
                             playerAction.heading = playerList.get(1).getCurrentHeading();
                             playerAction.action = PlayerActions.FIRETELEPORT;
                             System.out.println("Firing teleport to flee");
-                        } else if (bot.torpedoCount >= 2) {
+                        } else if (bot.torpedoCount >= 2 && bot.size > torpedoThresholdSize) {
                             playerAction.heading = getHeadingBetween(playerList.get(1));
                             playerAction.action = PlayerActions.FIRETORPEDOES;
-                            System.out.println("Firing torpedoes");
+                            System.out.println("Firing torpedoes for safety");
                         } else {
                             playerAction.heading = playerList.get(1).getCurrentHeading();
                             playerAction.action = PlayerActions.FORWARD;
                             System.out.println("Kaboor");
                         }
 
+                    } else if (distanceFixed > safeDistancePlayer && distanceFixed < 100 && bot.torpedoCount >= 2
+                            && bot.size > torpedoThresholdSize) {
+                        playerAction.heading = getHeadingBetween(playerList.get(1));
+                        playerAction.action = PlayerActions.FIRETORPEDOES;
+                        System.out.println("Firing torpedoes for afar");
                     } else {
                         playerAction.heading = getHeadingBetween(foodTarget);
                         System.out.println("eat food");
@@ -176,7 +187,7 @@ public class BotService {
                     playerAction.heading = getHeadingBetween(playerList.get(1));
                     if (bot.teleCount > 0 && bot.size >= teleporterAttackThresholdSize) {
                         playerAction.action = PlayerActions.FIRETELEPORT;
-                        System.out.println("Fire teleporter to enemy");
+                        System.out.println("Firing teleporter to enemy");
                     } else if (bot.torpedoCount >= 2) {
                         playerAction.action = PlayerActions.FIRETORPEDOES;
                         System.out.println("Firing torpedoes to enemy");
@@ -186,9 +197,15 @@ public class BotService {
                     }
                 }
 
+                if (bot.teleCount == 2 && bot.size > 30) {
+                    playerAction.action = PlayerActions.FIRETELEPORT;
+                    playerAction.heading = getHeadingBetween(foodTarget);
+                    System.out.println("Throwing out teleporters");
+                }
+
                 if (!teleporterList.isEmpty()) {
                     if (getDistanceBetween(bot, teleporterList.get(0)) < getDistanceBetween(bot, playerList.get(1))
-                            - 25) {
+                            - 15) {
                         playerAction.action = PlayerActions.TELEPORT;
                         System.out.println("TELEPORTING");
                     }
@@ -225,6 +242,11 @@ public class BotService {
         var triangleX = Math.abs(object1.getPosition().x - x);
         var triangleY = Math.abs(object1.getPosition().y - y);
         return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
+    }
+
+    // Biar aim jarak jauhnya bener
+    private int getHeadingAim(GameObject otherObject) {
+        return 0;
     }
 
     private int getHeadingBetween(GameObject otherObject) {
