@@ -54,11 +54,12 @@ public class BotService {
         }
         // heading if ini food baru lakuin ini
         var distNear = 10;
-        var degNear = 5;
+        // var degNear = 5;
+        var degNear = 5 + Math.atan(bot.size / getDistanceBetween(object, playerList.get(1)));
         if (!playerList.isEmpty()) {
             var dist = getDistanceBetween(object, playerList.get(1)) - bot.size - playerList.get(0).getSize();
-            if ((dist <= distNear) && (getHeadingBetween(object) <= (getHeadingBetween(playerList.get(1)) + distNear))
-                    && (getHeadingBetween(object) >= getHeadingBetween(playerList.get(1)) - distNear)) {
+            if ((dist <= distNear) && (getHeadingBetween(object) <= (getHeadingBetween(playerList.get(1)) + degNear))
+                    && (getHeadingBetween(object) >= getHeadingBetween(playerList.get(1)) - degNear)) {
                 System.out.println("Food not valid - Object heading not good");
                 return false;
             }
