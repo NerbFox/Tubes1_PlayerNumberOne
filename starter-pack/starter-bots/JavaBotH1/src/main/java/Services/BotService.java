@@ -45,14 +45,15 @@ public class BotService {
             }
         }
 
-        if (!asteroidFieldList.isEmpty()) {
-            for (GameObject asteroidField : asteroidFieldList) {
-                if (getDistanceBetween(object, asteroidField) + distError <= asteroidField.size) {
-                    System.out.println("Target not valid - Asteroid Fields Ahead");
-                    return false;
-                }
-            }
-        }
+        // if (!asteroidFieldList.isEmpty()) {
+        // for (GameObject asteroidField : asteroidFieldList) {
+        // if (getDistanceBetween(object, asteroidField) + distError <=
+        // asteroidField.size) {
+        // System.out.println("Target not valid - Asteroid Fields Ahead");
+        // return false;
+        // }
+        // }
+        // }
         // heading if ini food baru lakuin ini
         var distNear = 10;
         var degNear = 5;
@@ -188,13 +189,13 @@ public class BotService {
                 smallestPlayer = playerListBySize.get(smallestPlayerIndex);
 
                 // Thresholds
-                int safeDistancePlayer = 150 + nearestPlayer.getSize();
+                int safeDistancePlayer = 100 + nearestPlayer.getSize();
                 int teleporterFleeThresholdSize = 40;
                 int teleporterAttackThresholdSize = smallestPlayer.getSize() + 30;
                 int shieldAttackThresholdSize = 50;
 
                 int torpedoThresholdSize = 25;
-                double torpedoAttackThresholdDistance = 250;
+                double torpedoAttackThresholdDistance = 300 + nearestPlayer.getSize();
 
                 double supernovaDetonateDistance = nearestPlayer.getSize() + 20;
                 double teleporterDistanceThreshold = bot.size * 0.9;
@@ -203,15 +204,16 @@ public class BotService {
                 // int afterburnerDefenseSizeThreshold = 30;
 
                 int attackThresholdSize = 50;
-                int passiveThresholdSize = nearestPlayer.getSize() + 10;
+                int passiveThresholdSize = nearestPlayer.getSize();
 
                 var distNearestPlayer = getDistanceBetween(bot, nearestPlayer);
                 System.out.println(String.format("distNearestPlahyer = %f", distNearestPlayer));
                 var distNearestPlayerFixed = distNearestPlayer - nearestPlayer.size - bot.size;
                 System.out.println(String.format("distNearestPlayerFixed = %f", distNearestPlayerFixed));
                 System.out.println(String.format("safeDistancePlayer = %d", safeDistancePlayer));
+                System.out.println(String.format("BOT SIZE = %d", bot.size));
 
-                // System.out.println(String.format("Telecount = %d", bot.teleCount));
+                System.out.println(String.format("Telecount = %d", bot.teleCount));
 
                 if (bot.getSupernovaAvailable() > 0) { // Firing supernova if has one
 
@@ -225,7 +227,7 @@ public class BotService {
                                                                         // kecil dari
                         // safe distNearestPlayer
 
-                        playerAction.heading = getHeadingBetween(nearestPlayer) - 180;
+                        playerAction.heading = getHeadingBetween(nearestPlayer);
                         playerAction.action = PlayerActions.FORWARD;
                         // if (bot.teleCount > 0 && bot.size >= teleporterFleeThresholdSize) { // Kalau
                         // punya teleporter
@@ -239,7 +241,7 @@ public class BotService {
                             playerAction.action = PlayerActions.FIRETORPEDOES;
                             System.out.println("Firing torpedoes for safety");
                         } else { // Else kabur 180 derajat
-                            playerAction.heading = getHeadingBetween(nearestPlayer) - 180;
+                            playerAction.heading = nearestPlayer.getCurrentHeading();
                             playerAction.action = PlayerActions.FORWARD;
                             System.out.println("Kaboor");
                         }
@@ -276,21 +278,25 @@ public class BotService {
                         }
                     }
                 }
-                if (!teleporterList.isEmpty()) { // Jika dalam map ada teleporter yang sudah ditembakkan
+
+                if (!teleporterList.isEmpty()) {
                     int idx = smallestPlayerIndex;
                     var teleListByTargetDist = gameState.getGameObjects().stream()
                             .filter(item -> item.getGameObjectType() == ObjectTypes.TELEPORTER)
                             .sorted(Comparator.comparing(item -> getDistanceBetween(playerListBySize.get(idx), item)))
                             .collect(Collectors.toList());
+
                     if (!teleListByTargetDist.isEmpty()) {
                         System.out.println(String.format("teleporter distance = %f",
                                 getDistanceBetween(smallestPlayer, teleListByTargetDist.get(0))
                                         + smallestPlayer.size));
+                        System.out.println(smallestPlayer.getId());
+
                         if (getDistanceBetween(smallestPlayer, teleListByTargetDist.get(0))
-                                + smallestPlayer.size < teleporterDistanceThreshold
+                                - smallestPlayer.size < teleporterDistanceThreshold
                                 && bot.size > smallestPlayer.size + 5) {
-                            // Teleport ke lokasi teleporter ketika teleporter sudah
-                            // dekat dengan target
+
+                            System.out.println(String.format("Smallest player size = %d", smallestPlayer.getSize()));
                             playerAction.action = PlayerActions.TELEPORT;
                             System.out.println("TELEPORTING");
                         }
