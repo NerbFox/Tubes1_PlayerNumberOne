@@ -220,7 +220,7 @@ public class BotService {
                             playerAction.action = PlayerActions.FIRETORPEDOES;
                             System.out.println("Firing torpedoes for safety");
                         } else { // Else flee to the same direction of enemy heading
-                            playerAction.heading = nearestPlayer.getCurrentHeading();
+                            playerAction.heading = (getHeadingBetween(nearestPlayer) - 180) % 360;
                             playerAction.action = PlayerActions.FORWARD;
                             System.out.println("Kaboor");
                         }
