@@ -15,7 +15,7 @@ public class GameObject {
   public Integer supernovaAvailable;
   public Integer teleCount;
   public Integer shieldCount;
-
+  
   public GameObject(UUID id, Integer size, Integer speed, Integer currentHeading, Position position,
       ObjectTypes gameObjectType, Integer effects, Integer torpedoCount, Integer supernovaAvailable,
       Integer teleCount, Integer shieldCount) {

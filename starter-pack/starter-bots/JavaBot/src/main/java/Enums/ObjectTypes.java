@@ -21,7 +21,8 @@ public enum ObjectTypes {
 
   public static ObjectTypes valueOf(Integer value) {
     for (ObjectTypes objectType : ObjectTypes.values()) {
-      if (objectType.value == value) return objectType;
+      if (objectType.value == value)
+        return objectType;
     }
 
     throw new IllegalArgumentException("Value not found");
