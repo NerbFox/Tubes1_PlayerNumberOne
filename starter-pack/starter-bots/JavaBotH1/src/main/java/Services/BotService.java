@@ -35,7 +35,7 @@ public class BotService {
     private Boolean isNextTargetValid(GameObject object, List<GameObject> gasCloudList,
             List<GameObject> asteroidFieldList, List<GameObject> playerList) {
         var distError = 5;
-        // Gas cloud
+        // Check targets (food and bots) near gas clouds
         if (!gasCloudList.isEmpty()) {
             for (GameObject gasCloud : gasCloudList) {
                 if (getDistanceBetween(object, gasCloud) + distError <= gasCloud.size) {
@@ -45,39 +45,29 @@ public class BotService {
             }
         }
 
-        // if (!asteroidFieldList.isEmpty()) {
-        // for (GameObject asteroidField : asteroidFieldList) {
-        // if (getDistanceBetween(object, asteroidField) + distError <=
-        // asteroidField.size) {
-        // System.out.println("Target not valid - Asteroid Fields Ahead");
-        // return false;
-        // }
-        // }
-        // }
-        // heading if ini food baru lakuin ini
+        // Check food near enemy bot
         var distNear = 10;
         var degNear = 5;
         if (object.gameObjectType == ObjectTypes.FOOD) {
             if (!playerList.isEmpty()) {
                 var dist = getDistanceBetween(object, playerList.get(1)) - bot.size - playerList.get(0).getSize();
+                System.out.println(String.format("Dist to dangerous objects: %f", dist));
                 if ((dist <= distNear)
                         && (getHeadingBetween(object) <= (getHeadingBetween(playerList.get(1)) + degNear))
                         && (getHeadingBetween(object) >= getHeadingBetween(playerList.get(1)) - degNear)) {
                     System.out.println("Food not valid - Object heading not good");
                     return false;
                 }
-                // for(GameObject player : playerList ){
 
             }
         }
 
-        // inBorder
+        // Check targets (food and bots) near borders
         if (inBorderValid(object)) {
             System.out.println("Target not valid - target inborder");
             return false;
         }
 
-        // System.out.println("Food valid");
         return true;
 
     }
@@ -101,9 +91,11 @@ public class BotService {
     }
 
     public void computeNextPlayerAction(PlayerAction playerAction) {
+        // Intial player action
         playerAction.action = PlayerActions.FORWARD;
         playerAction.heading = new Random().nextInt(360);
 
+        // Object lists sorted by a specific criteria
         var torpedoList = gameState.getGameObjects().stream()
                 .filter(item -> item.getGameObjectType() == ObjectTypes.TORPEDOSALVO)
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
@@ -136,18 +128,15 @@ public class BotService {
 
         if (!gameState.getGameObjects().isEmpty()) {
 
+            // Take action if target is still available
             if (!mostOftenTarget.isEmpty() && !playerList.isEmpty() && !playerListBySize.isEmpty()) {
                 // Index lists
                 int collectibleIndex = 0;
-                int smallestPlayerIndex = 0;
                 int nearestPlayerIndex = 1;
+
                 // Possible targets
                 var foodTarget = mostOftenTarget.get(collectibleIndex);
                 var nearestPlayer = playerList.get(1);
-                var smallestPlayer = playerListBySize.get(smallestPlayerIndex);
-                var nearestPlayerDistance = getDistanceBetween(bot, nearestPlayer);
-                var smallestPlayerDistance = getDistanceBetween(bot, smallestPlayer);
-                var biggestPlayer = playerListBySize.get(playerListBySize.size() - 1);
 
                 // Check food valid
                 while (!isNextTargetValid(foodTarget, gasCloudList, asteroidFieldList, playerList)) {
@@ -161,7 +150,7 @@ public class BotService {
                     }
                 }
 
-                // Get nearest player
+                // Check nearest player is a valid target or not
                 while (!isNextTargetValid(nearestPlayer, gasCloudList, asteroidFieldList, playerList)) {
                     System.out.println("Change enemy target, enemy isnt valid");
                     if (nearestPlayerIndex < playerList.size()) {
@@ -172,49 +161,31 @@ public class BotService {
                         break;
                     }
                 }
-
-                // Get smallest player
-                while (!isNextTargetValid(smallestPlayer, gasCloudList, asteroidFieldList, playerList)) {
-                    if (smallestPlayerIndex < playerListBySize.size() || smallestPlayer.getId() == bot.id) {
-                        System.out.println("Change smallest enemy target, smallest enemy isnt valid");
-                        smallestPlayerIndex++;
-                    } else {
-                        smallestPlayer = playerListBySize.get(0);
-                        smallestPlayerIndex = 0;
-                        break;
-                    }
-                }
-
                 nearestPlayer = playerList.get(nearestPlayerIndex);
-                smallestPlayer = playerListBySize.get(smallestPlayerIndex);
 
                 // Thresholds
                 int safeDistancePlayer = 100 + nearestPlayer.getSize();
-                int teleporterFleeThresholdSize = 40;
-                int teleporterAttackThresholdSize = smallestPlayer.getSize() + 30;
-                int shieldAttackThresholdSize = 50;
+                int teleporterAttackThresholdSize = nearestPlayer.getSize() + 30;
 
                 int torpedoThresholdSize = 25;
                 double torpedoAttackThresholdDistance = 300 + nearestPlayer.getSize();
 
                 double supernovaDetonateDistance = nearestPlayer.getSize() + 20;
-                double teleporterDistanceThreshold = bot.size * 0.9;
+                double teleporterDistanceThreshold = bot.size * 0.7;
 
-                // int afterburnerAttackSizeThreshold = 50;
-                // int afterburnerDefenseSizeThreshold = 30;
-
-                int attackThresholdSize = 50;
                 int passiveThresholdSize = nearestPlayer.getSize();
 
                 var distNearestPlayer = getDistanceBetween(bot, nearestPlayer);
-                System.out.println(String.format("distNearestPlahyer = %f", distNearestPlayer));
                 var distNearestPlayerFixed = distNearestPlayer - nearestPlayer.size - bot.size;
+
+                // Terminal log
+                System.out.println(String.format("distNearestPlahyer = %f", distNearestPlayer));
                 System.out.println(String.format("distNearestPlayerFixed = %f", distNearestPlayerFixed));
                 System.out.println(String.format("safeDistancePlayer = %d", safeDistancePlayer));
                 System.out.println(String.format("BOT SIZE = %d", bot.size));
-
                 System.out.println(String.format("Telecount = %d", bot.teleCount));
 
+                // Decision making
                 if (bot.getSupernovaAvailable() > 0) { // Firing supernova if has one
 
                     playerAction.heading = getHeadingBetween(nearestPlayer);
@@ -223,30 +194,25 @@ public class BotService {
 
                 } else if (bot.size < passiveThresholdSize) { // Passive mode
 
-                    if (distNearestPlayerFixed <= safeDistancePlayer) { // Kondisi ketika player distNearestPlayer lebih
-                                                                        // kecil dari
-                        // safe distNearestPlayer
+                    if (distNearestPlayerFixed <= safeDistancePlayer) { // Go to counter mode if enemy close to player
+                                                                        // distance
 
                         playerAction.heading = getHeadingBetween(nearestPlayer);
                         playerAction.action = PlayerActions.FORWARD;
-                        // if (bot.teleCount > 0 && bot.size >= teleporterFleeThresholdSize) { // Kalau
-                        // punya teleporter
-                        // // tepat 1, pake teleporter
-                        // // buat kabur
-                        // playerAction.heading = getHeadingBetween(nearestPlayer) - 180;
-                        // playerAction.action = PlayerActions.FIRETELEPORT;
-                        // System.out.println("Firing teleport to flee");
+
+                        // Fire torpedoes if has more than 2 torpedoes and player size larger than
+                        // threshold
                         if (bot.torpedoCount >= 2 && bot.size > torpedoThresholdSize) {
                             playerAction.heading = getHeadingBetween(nearestPlayer);
                             playerAction.action = PlayerActions.FIRETORPEDOES;
                             System.out.println("Firing torpedoes for safety");
-                        } else { // Else kabur 180 derajat
+                        } else { // Else flee to the same direction of enemy heading
                             playerAction.heading = nearestPlayer.getCurrentHeading();
                             playerAction.action = PlayerActions.FORWARD;
                             System.out.println("Kaboor");
                         }
 
-                    } else { // Eat food
+                    } else { // Eat food if in a safe distance
                         playerAction.heading = getHeadingBetween(foodTarget);
                         playerAction.action = PlayerActions.FORWARD;
                         System.out.println("Eat food");
@@ -257,21 +223,24 @@ public class BotService {
                     playerAction.action = PlayerActions.FORWARD;
                     playerAction.heading = getHeadingBetween(nearestPlayer);
                     System.out.println(distNearestPlayerFixed);
-
-                    if (bot.teleCount > 0 && teleporterAttackThresholdSize <= bot.size) {
-                        // threshold sisze mencukupi,
-                        // tembak teleporter
-                        playerAction.heading = getHeadingBetween(smallestPlayer);
+                    // Fire teleporters if have teleporter and player size larger than threshold
+                    if (bot.teleCount > 0 && bot.size >= teleporterAttackThresholdSize) {
+                        playerAction.heading = getHeadingBetween(nearestPlayer);
                         playerAction.action = PlayerActions.FIRETELEPORT;
                         System.out.println("Firing teleporter to enemy");
+
                     } else if (bot.torpedoCount >= 2 && distNearestPlayerFixed <= torpedoAttackThresholdDistance) {
+                        // Fire torpedoes if player dont have teleporters and distance to enemy smaller
+                        // then threshold
                         playerAction.action = PlayerActions.FIRETORPEDOES;
                         System.out.println("Close Enough - Firing torpedoes to enemy");
-                    } else {
+                    } else { // If dont have teleporters or torpedoes or threshold not fulfilled
+
+                        // If close enough, chase enemy
                         if (distNearestPlayerFixed <= torpedoAttackThresholdDistance) {
                             playerAction.action = PlayerActions.FORWARD;
                             System.out.println("Chasing enemy");
-                        } else {
+                        } else { // If enemy too far, search for food
                             playerAction.action = PlayerActions.FORWARD;
                             playerAction.heading = getHeadingBetween(foodTarget);
                             System.out.println("Enemy too far, going to eat food");
@@ -279,39 +248,43 @@ public class BotService {
                     }
                 }
 
+                // If there are teleporters in map,
                 if (!teleporterList.isEmpty()) {
-                    int idx = smallestPlayerIndex;
+
+                    // Get list of teleporter sorted by distance from target to teleporter
+                    int idx = nearestPlayerIndex;
                     var teleListByTargetDist = gameState.getGameObjects().stream()
                             .filter(item -> item.getGameObjectType() == ObjectTypes.TELEPORTER)
-                            .sorted(Comparator.comparing(item -> getDistanceBetween(playerListBySize.get(idx), item)))
+                            .sorted(Comparator.comparing(item -> getDistanceBetween(playerList.get(idx), item)))
                             .collect(Collectors.toList());
-
+                    // Check for tele list to avoid bot crashing because of out of bounds error
                     if (!teleListByTargetDist.isEmpty()) {
                         System.out.println(String.format("teleporter distance = %f",
-                                getDistanceBetween(smallestPlayer, teleListByTargetDist.get(0))
-                                        + smallestPlayer.size));
-                        System.out.println(smallestPlayer.getId());
+                                getDistanceBetween(nearestPlayer, teleListByTargetDist.get(0))
+                                        + nearestPlayer.size));
+                        // Fire teleporter if distance from target to teleporter fulfilled the threshold
+                        if (getDistanceBetween(nearestPlayer, teleListByTargetDist.get(0))
+                                - nearestPlayer.size < teleporterDistanceThreshold
+                                && bot.size > nearestPlayer.size + 5) {
 
-                        if (getDistanceBetween(smallestPlayer, teleListByTargetDist.get(0))
-                                - smallestPlayer.size < teleporterDistanceThreshold
-                                && bot.size > smallestPlayer.size + 5) {
-
-                            System.out.println(String.format("Smallest player size = %d", smallestPlayer.getSize()));
                             playerAction.action = PlayerActions.TELEPORT;
                             System.out.println("TELEPORTING");
                         }
                     }
                 }
 
+                // If supernova bomb in map,
                 if (!supernovaBombList.isEmpty()) {
+                    // Detonate supernova if distance is close enough with nearest player
                     if (getDistanceBetween(nearestPlayer, supernovaBombList.get(0)) < supernovaDetonateDistance) {
                         playerAction.action = PlayerActions.DETONATESUPERNOVA;
                         System.out.println("DETONATE SUPERNOVA");
                     }
                 }
-            } else {
+            } else { // If no target available, go to center
                 playerAction.action = PlayerActions.FORWARD;
                 playerAction.heading = getHeadingPosition(bot, 0, 0);
+                System.out.println("No target available, go to center");
             }
         }
 
