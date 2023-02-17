@@ -45,7 +45,7 @@ public class BotService {
         }
 
         // Check food near enemy bot
-        var distNear = 10;
+        var distNear = 5;
         var degNear = 5;
         if (object.gameObjectType == ObjectTypes.FOOD) {
             if (!playerList.isEmpty()) {
@@ -173,11 +173,11 @@ public class BotService {
                 nearestPlayer = playerList.get(nearestPlayerIndex);
 
                 // Thresholds
-                int safeDistancePlayer = 100 + nearestPlayer.getSize();
+                int safeDistancePlayer = 200 + nearestPlayer.getSize();
                 int teleporterAttackThresholdSize = nearestPlayer.getSize() + 30;
 
                 int torpedoThresholdSize = 25;
-                double torpedoAttackThresholdDistance = 300 + nearestPlayer.getSize();
+                double torpedoAttackThresholdDistance = 400 + nearestPlayer.getSize();
 
                 double supernovaDetonateDistance = nearestPlayer.getSize() + 20;
                 double teleporterDistanceThreshold = bot.size * 0.7;
@@ -237,7 +237,7 @@ public class BotService {
                     playerAction.heading = getHeadingBetween(nearestPlayer);
                     System.out.println(distNearestPlayerFixed);
                     // Fire teleporters if have teleporter and player size larger than threshold
-                    if (bot.teleCount == 1 && bot.size >= teleporterAttackThresholdSize) {
+                    if (bot.teleCount > 0 && bot.size >= teleporterAttackThresholdSize) {
                         playerAction.heading = getHeadingBetween(nearestPlayer);
                         playerAction.action = PlayerActions.FIRETELEPORT;
                         System.out.println("Firing teleporter to enemy");

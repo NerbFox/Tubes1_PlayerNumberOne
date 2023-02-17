@@ -1,10 +1,10 @@
 @echo off
 :: Game Runner
-cd ./starter-bots/JavaBotH1
+::cd ./starter-bots/JavaBotH1
 timeout /t 1
-start mvn clean package
-timeout /t 5
-cd ../..
+::start mvn clean package
+::timeout /t 5
+::cd ../..
 cd ./runner-publish/
 start "" dotnet GameRunner.dll
 
@@ -20,16 +20,43 @@ start "" dotnet Logger.dll
 :: Bots
 cd ../starter-bots/JavaBotH1/target
 timeout /t 3
-start "" java -jar JavaBot.jar
-cd ../../JavaBotN1/target
+start "Num1" java -jar JavaBot.jar
+:: timeout /t 3
+:: start "Num2" java -jar JavaBot.jar
+:: cd ../../../reference-bot-publish
+:: timeout /t 3
+:: start "reference" dotnet ReferenceBot.dll
+:: timeout /t 3
+:: start "reference" dotnet ReferenceBot.dll
+
+
+:: timeout /t 3
+:: start "bangkit" java -jar Bangkit.jar
+:: timeout /t 3
+:: start "dillon" java -jar dilon.jar
 timeout /t 3
-start "" java -jar JavaBot.jar
-cd ../../JavaBot/target
+start "leon" java -jar Leon.jar
 timeout /t 3
-start "" java -jar JavaBot.jar
-cd ../../../reference-bot-publish
+start "nawwar" java -jar Nawwar.jar
 timeout /t 3
-start "" dotnet ReferenceBot.dll
+start "hanan" java -jar hanan.jar
+timeout /t 3
+start "rava" java -jar RavaBot.jar
+:: timeout /t 3
+:: start "jovan" java -jar Blackmamba.jar
+:: timeout /t 3
+:: start "jovan" java -jar Blackmamba.jar
+:: timeout /t 3
+:: start "jovan" java -jar Blackmamba.jar
 cd ../
+:: timeout /t 3
+:: start "" java -jar JavaBot.jar
+:: cd ../../JavaBot/target
+:: timeout /t 3
+:: start "" java -jar JavaBot.jar
+:: cd ../../JavaBotN2/target
+:: timeout /t 3
+:: start "" java -jar JavaBot.jar
+:: cd ../
 
 pause
