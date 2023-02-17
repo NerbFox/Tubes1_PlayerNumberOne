@@ -89,6 +89,25 @@ public class BotService {
         return inBorder;
     }
 
+    // private boolean isPlayerInBorder() {
+    // boolean inBorder = false;
+    // var rad = gameState.getWorld().getRadius();
+    // double distToBorderMin = rad * 0.05;
+
+    // if (!gameState.getGameObjects().isEmpty()) {
+    // if ((rad - (getDistancePosition(bot, gameState.getWorld().getCenterPoint().x,
+    // gameState.getWorld().getCenterPoint().y) + bot.getSize())) <=
+    // distToBorderMin) {
+    // inBorder = true;
+    // System.out.println("inBorder");
+    // } else {
+    // inBorder = false;
+    // // System.out.println("outBorder");
+    // }
+    // }
+    // return inBorder;
+    // }
+
     public void computeNextPlayerAction(PlayerAction playerAction) {
         // Intial player action
         playerAction.action = PlayerActions.FORWARD;
@@ -182,6 +201,10 @@ public class BotService {
                     playerAction.action = PlayerActions.FIRESUPERNOVA;
                     System.out.println("Firing SUPERNOVA");
 
+                } else if (inBorderValid(bot)) { // Check if bot near border
+                    playerAction.action = PlayerActions.FORWARD;
+                    playerAction.heading = getHeadingPosition(bot, 0, 0);
+                    System.out.println("Near border, go to center");
                 } else if (bot.size < passiveThresholdSize) { // Passive mode
 
                     if (distNearestPlayerFixed <= safeDistancePlayer) { // Go to counter mode if enemy close to player
