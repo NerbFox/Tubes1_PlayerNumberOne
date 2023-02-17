@@ -32,8 +32,7 @@ public class BotService {
         this.playerAction = playerAction;
     }
 
-    private Boolean isNextTargetValid(GameObject object, List<GameObject> gasCloudList,
-            List<GameObject> asteroidFieldList, List<GameObject> playerList) {
+    private Boolean isNextTargetValid(GameObject object, List<GameObject> gasCloudList, List<GameObject> playerList) {
         var distError = 5;
         // Check targets (food and bots) near gas clouds
         if (!gasCloudList.isEmpty()) {
@@ -110,9 +109,6 @@ public class BotService {
         var gasCloudList = gameState.getGameObjects().stream()
                 .filter(item -> item.getGameObjectType() == ObjectTypes.GASCLOUD)
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
-        var asteroidFieldList = gameState.getGameObjects().stream()
-                .filter(item -> item.getGameObjectType() == ObjectTypes.ASTEROIDFIELD)
-                .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
         var supernovaBombList = gameState.getGameObjects().stream()
                 .filter(item -> item.getGameObjectType() == ObjectTypes.SUPERNOVABOMB)
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
@@ -133,7 +129,7 @@ public class BotService {
                 var nearestPlayer = playerList.get(1);
 
                 // Check food valid
-                while (!isNextTargetValid(foodTarget, gasCloudList, asteroidFieldList, playerList)) {
+                while (!isNextTargetValid(foodTarget, gasCloudList, playerList)) {
                     System.out.println("Change food target, food isnt valid");
                     if (collectibleIndex < mostOftenTarget.size()) {
                         collectibleIndex++;
@@ -145,7 +141,7 @@ public class BotService {
                 }
 
                 // Check nearest player is a valid target or not
-                while (!isNextTargetValid(nearestPlayer, gasCloudList, asteroidFieldList, playerList)) {
+                while (!isNextTargetValid(nearestPlayer, gasCloudList, playerList)) {
                     System.out.println("Change enemy target, enemy isnt valid");
                     if (nearestPlayerIndex < playerList.size()) {
                         nearestPlayerIndex++;
