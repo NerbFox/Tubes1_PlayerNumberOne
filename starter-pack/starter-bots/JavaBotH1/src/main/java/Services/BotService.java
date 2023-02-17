@@ -61,11 +61,11 @@ public class BotService {
             }
         }
 
-        // Check targets (food and bots) near borders
-        if (inBorderValid(object)) {
-            System.out.println("Target not valid - target inborder");
-            return false;
-        }
+        // // Check targets (food and bots) near borders
+        // if (inBorderValid(object)) {
+        // System.out.println("Target not valid - target inborder");
+        // return false;
+        // }
 
         return true;
 
@@ -165,8 +165,8 @@ public class BotService {
                     if (nearestPlayerIndex < playerList.size()) {
                         nearestPlayerIndex++;
                     } else {
-                        nearestPlayer = playerList.get(0);
-                        nearestPlayerIndex = 0;
+                        nearestPlayer = playerList.get(1);
+                        nearestPlayerIndex = 1;
                         break;
                     }
                 }
@@ -182,7 +182,7 @@ public class BotService {
                 double supernovaDetonateDistance = nearestPlayer.getSize() + 20;
                 double teleporterDistanceThreshold = bot.size * 0.7;
 
-                int passiveThresholdSize = nearestPlayer.getSize();
+                int passiveThresholdSize = nearestPlayer.getSize() + 10;
 
                 var distNearestPlayer = getDistanceBetween(bot, nearestPlayer);
                 var distNearestPlayerFixed = distNearestPlayer - nearestPlayer.size - bot.size;
@@ -237,7 +237,7 @@ public class BotService {
                     playerAction.heading = getHeadingBetween(nearestPlayer);
                     System.out.println(distNearestPlayerFixed);
                     // Fire teleporters if have teleporter and player size larger than threshold
-                    if (bot.teleCount > 0 && bot.size >= teleporterAttackThresholdSize) {
+                    if (bot.teleCount == 1 && bot.size >= teleporterAttackThresholdSize) {
                         playerAction.heading = getHeadingBetween(nearestPlayer);
                         playerAction.action = PlayerActions.FIRETELEPORT;
                         System.out.println("Firing teleporter to enemy");
