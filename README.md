@@ -19,10 +19,32 @@ Galaxio adalah sebuah game battle royale yang mempertandingkan bot kapal anda de
 
 ## Technologies Used
 - java (minimal java 11)
-- .Net Core 5.0
+- .Net Core 5.0 dan 3.0 
+- Maven (hanya untuk build source code)
 
 
 ## Penjelasan Singkat Algoritma
+* List semua kebutuhan objek berdasarkan jenisnya kemudian diurutkan berdasarkan jarak terdekat dengan kami atau meminimisasi-nya sesuai dengan algoritma greedy. Untuk smallestFood dan smallestPlayer diberikan fungsi seleksi tambahan yaitu validasi apakah food atau player tersebut berada dalam gas cloud dan apakah berada di dekat border dari permainan.
+* Inisiasi awal dari batasan-batasan seperti jarak dan ukuran.
+* Membagi 3 kondisi utama sebagai dasar utama sebagai fungsi solusi yang akan dipilih untuk aksi berikutnya yaitu: 
+    - Firing supernova jika memilikinya
+    - Passive mode : bot bertindak lebih utama untuk mencari makanan 
+    - Active mode : bot lebih aktif untuk menyerang ke lawan
+* Supernova adalah langkah pertimbangan pertama yang dilakukan oleh bot. Jika bot memiliki supernova, ia akan menembakkannya ke arah player dengan jarak terdekat daripadanya.
+* Passive mode merupakan kondisi saat ukuran dari bot lebih besar dari player lawan terdekat. Passive mode mempertimbangkan jarak yang terbagi menjadi :
+    - Jarak bot dengan lawan terlalu dekat, kondisi ini terbagi menjadi 2 kegiatan lainnya yaitu:
+        - Jika bot memiliki torpedo, bot akan menembakkan torpedo ke arah lawan sambil menjauh
+        - Jika tidak memiliki torpedo, bot hanya akan menjauh saja
+    - Jarak bot dengan lawan tidak terlalu dekat, bot akan mencari makanan
+- Active mode merupakan kondisi saat ukuran dari bot lebih besar dari player lawan terdekat. Active mode mempertimbangkan banyak alat menyerang yang dimiliki oleh bot, yaitu:
+    - Jika bot memiliki peluru teleporter dan ukuran bot setelah menembakkan teleporter tidak lebih kecil dari player yang dituju, bot akan menembakkan teleporter ke arah lawan tersebut.
+    - Jika bot tidak memiliki teleporter tetapi memiliki torpedo dan jaraknya sudah sesuai, bot akan menembakkan torpedonya ke arah lawan
+    - Jika tidak memliki keduanya, maka:
+        - Jika jarak sudah dekat, maka bot akan mengejar lawan
+        - Jika jarak terlalu jauh, maka bot akan mencari makanan
+- Setelah melakukan evaluasi utama tersebut, bot akan mengevaluasi detonasi teleporter. Jika pemain terdekat memiliki jarak yang dekat dengan sebuah teleporter, maka bot akan melakukan detonasi pada teleporter (walaupun teleport yang dekat bukan bukan milik bot).
+- Bot kemudian mengevaluasi detonasi supernova. Jika supernova yang berada di map memiliki jarak yang dekat dengan player terdekat dari bot, bot akan meledakkan supernova.
+- Diluar semua kondisi tersebut, ketika objek lain selain player sudah tidak ada, bot akan mengarah ke tengah map.
 
 
 
@@ -36,6 +58,8 @@ Galaxio adalah sebuah game battle royale yang mempertandingkan bot kapal anda de
 
 
 ## Cara menjalankan program 
+Untuk build program dapat dilakukan dengan : 
+- command "mvn clean package" (pada root direktori dari repositori)
 Berikut merupakan cara menjalankan game secara lokal di Windows:
 1. Lakukan konfigurasi jumlah bot yang ingin dimainkan pada file JSON ”appsettings.json” dalam folder “runner-publish” dan“engine-publish”
 2. Buka terminal baru pada folder runner-publish.
