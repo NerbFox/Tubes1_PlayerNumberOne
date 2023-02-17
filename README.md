@@ -4,6 +4,7 @@ Tugas Besar 1 IF2211 – Strategi Algoritma Tahun 2022/2023
 ## Table of Contents
 * [General Info](#general-information)
 * [Technologies Used](#technologies-used)
+* [Penjelasan Singkat Algoritma](#Penjelasan-Singkat-Algoritma)
 * [Features](#features)
 * [Screenshots](#screenshots)
 * [Setup](#cara-menjalankan-program)
@@ -19,6 +20,11 @@ Galaxio adalah sebuah game battle royale yang mempertandingkan bot kapal anda de
 ## Technologies Used
 - java (minimal java 11)
 - .Net Core 5.0
+
+
+## Penjelasan Singkat Algoritma
+
+
 
 ## Features
 - Implementasi dari algoritma greedy pada kode program bot PlayerNumberOne
