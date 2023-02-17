@@ -61,16 +61,11 @@ public class BotService {
             }
         }
 
-        // // Check targets (food and bots) near borders
-        // if (inBorderValid(object)) {
-        // System.out.println("Target not valid - target inborder");
-        // return false;
-        // }
-
         return true;
 
     }
 
+    // Method for checking if an object is near the border map
     private boolean inBorderValid(GameObject object) {
         boolean inBorder = false;
         var rad = gameState.getWorld().getRadius();
@@ -83,30 +78,10 @@ public class BotService {
                 System.out.println("inBorder");
             } else {
                 inBorder = false;
-                // System.out.println("outBorder");
             }
         }
         return inBorder;
     }
-
-    // private boolean isPlayerInBorder() {
-    // boolean inBorder = false;
-    // var rad = gameState.getWorld().getRadius();
-    // double distToBorderMin = rad * 0.05;
-
-    // if (!gameState.getGameObjects().isEmpty()) {
-    // if ((rad - (getDistancePosition(bot, gameState.getWorld().getCenterPoint().x,
-    // gameState.getWorld().getCenterPoint().y) + bot.getSize())) <=
-    // distToBorderMin) {
-    // inBorder = true;
-    // System.out.println("inBorder");
-    // } else {
-    // inBorder = false;
-    // // System.out.println("outBorder");
-    // }
-    // }
-    // return inBorder;
-    // }
 
     public void computeNextPlayerAction(PlayerAction playerAction) {
         // Intial player action
@@ -117,9 +92,6 @@ public class BotService {
         var playerList = gameState.getPlayerGameObjects().stream()
                 .filter(item -> item.getGameObjectType() == ObjectTypes.PLAYER)
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
-        var playerListBySize = gameState.getPlayerGameObjects().stream()
-                .filter(item -> item.getGameObjectType() == ObjectTypes.PLAYER)
-                .sorted(Comparator.comparing(item -> item.size)).collect(Collectors.toList());
         var mostOftenTarget = gameState.getGameObjects().stream()
                 .filter(item -> ((item.getGameObjectType() == ObjectTypes.FOOD)
                         || (item.getGameObjectType() == ObjectTypes.SUPERFOOD)
@@ -138,7 +110,7 @@ public class BotService {
         if (!gameState.getGameObjects().isEmpty()) {
 
             // Take action if target is still available
-            if (!mostOftenTarget.isEmpty() && !playerList.isEmpty() && !playerListBySize.isEmpty()) {
+            if (!mostOftenTarget.isEmpty() && !playerList.isEmpty()) {
                 // Index lists
                 int collectibleIndex = 0;
                 int nearestPlayerIndex = 1;
@@ -177,7 +149,7 @@ public class BotService {
                 int teleporterAttackThresholdSize = nearestPlayer.getSize() + 30;
 
                 int torpedoThresholdSize = 25;
-                double torpedoAttackThresholdDistance = 400 + nearestPlayer.getSize();
+                double torpedoAttackThresholdDistance = 300 + nearestPlayer.getSize();
 
                 double supernovaDetonateDistance = nearestPlayer.getSize() + 20;
                 double teleporterDistanceThreshold = bot.size * 0.7;
@@ -326,6 +298,7 @@ public class BotService {
         return Math.sqrt(triangleX * triangleX + triangleY * triangleY);
     }
 
+    // Method for calculating distance from an object to a certain position
     private double getDistancePosition(GameObject object1, int x, int y) {
         var triangleX = Math.abs(object1.getPosition().x - x);
         var triangleY = Math.abs(object1.getPosition().y - y);

@@ -73,17 +73,6 @@ public class Main {
         // This is a blocking call
         hubConnection.start().subscribe(() -> {
             while (hubConnection.getConnectionState() == HubConnectionState.CONNECTED) {
-                // Thread.sleep(20);
-                // GameObject bot = botService.getBot();
-                // // if (bot == null) {
-                // // continue;
-                // // }
-
-                // botService.getPlayerAction().setPlayerId(bot.getId());
-                // botService.computeNextPlayerAction(botService.getPlayerAction());
-                // if (hubConnection.getConnectionState() == HubConnectionState.CONNECTED) {
-                // hubConnection.send("SendPlayerAction", botService.getPlayerAction());
-                // }
                 continue;
             }
         });
