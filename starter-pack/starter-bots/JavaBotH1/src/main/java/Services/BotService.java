@@ -96,9 +96,6 @@ public class BotService {
         playerAction.heading = new Random().nextInt(360);
 
         // Object lists sorted by a specific criteria
-        var torpedoList = gameState.getGameObjects().stream()
-                .filter(item -> item.getGameObjectType() == ObjectTypes.TORPEDOSALVO)
-                .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
         var playerList = gameState.getPlayerGameObjects().stream()
                 .filter(item -> item.getGameObjectType() == ObjectTypes.PLAYER)
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
@@ -109,9 +106,6 @@ public class BotService {
                 .filter(item -> ((item.getGameObjectType() == ObjectTypes.FOOD)
                         || (item.getGameObjectType() == ObjectTypes.SUPERFOOD)
                         || (item.getGameObjectType() == ObjectTypes.SUPERNOVAPICKUP)))
-                .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
-        var wormholeList = gameState.getGameObjects().stream()
-                .filter(item -> item.getGameObjectType() == ObjectTypes.WORMHOLE)
                 .sorted(Comparator.comparing(item -> getDistanceBetween(bot, item))).collect(Collectors.toList());
         var gasCloudList = gameState.getGameObjects().stream()
                 .filter(item -> item.getGameObjectType() == ObjectTypes.GASCLOUD)
